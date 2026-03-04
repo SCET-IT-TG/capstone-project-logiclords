@@ -1,5 +1,6 @@
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+
 import { motion } from "framer-motion";
 export default function DashboardLayout({ children }) {
   <motion.div

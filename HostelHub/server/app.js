@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+
 dotenv.config();
+
 import connectDB from "./db.js";
 import { errorHandler } from "./src/middleware/error.middleware.js";
 
@@ -16,25 +18,26 @@ import feeRoutes from "./src/routes/fee.routes.js";
 import visitorRoutes from "./src/routes/visitor.routes.js";
 import qrRoutes from "./src/routes/qr.routes.js";
 
-
 connectDB();
-
 
 const app = express();
 
+// Middleware
 app.use(
   cors({
-    origin: "http://localhost:3000", // 🔥 your frontend port
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static("uploads"));
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/students", studentRoutes);
+app.use("/api/students", studentRoutes); // ✅ Correct
 app.use("/api/wardens", wardenRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/complaints", complaintRoutes);
@@ -42,6 +45,7 @@ app.use("/api/fees", feeRoutes);
 app.use("/api/visitors", visitorRoutes);
 app.use("/api/qr", qrRoutes);
 
+// Error middleware
 app.use(errorHandler);
 
 export default app;

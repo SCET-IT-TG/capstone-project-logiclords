@@ -9,7 +9,7 @@ import {
   LogOut
 } from "lucide-react";
 
-// ✅ IMPORT LOGO (Correct Way)
+// ✅ IMPORT LOGO
 import logo from "../../assets/logo.png";
 
 export default function Sidebar() {
@@ -23,23 +23,72 @@ export default function Sidebar() {
 
   // ✅ Role Based Menu
   const menu = {
+
     admin: [
-      { name: "Dashboard", path: "/admin-dashboard", icon: <LayoutDashboard size={18}/> },
-      { name: "Students", path: "/create-student", icon: <Users size={18}/> },
-      { name: "Wardens", path: "/create-warden", icon: <UserCog size={18}/> },
-      { name: "Complaints", path: "/complaints", icon: <Wrench size={18}/> }
+      {
+        name: "Dashboard",
+        path: "/admin-dashboard",
+        icon: <LayoutDashboard size={18}/>
+      },
+
+      {
+        name: "Register Student",
+        path: "/create-student",
+        icon: <Users size={18}/>
+      },
+
+      // ✅ FIXED ROUTE
+      {
+        name: "Register Warden",
+        path: "/admin/create-warden",
+        icon: <UserCog size={18}/>
+      },
+
+      {
+        name: "Complaints",
+        path: "/complaints",
+        icon: <Wrench size={18}/>
+      }
     ],
 
     warden: [
-      { name: "Dashboard", path: "/warden-dashboard", icon: <LayoutDashboard size={18}/> },
-      { name: "QR Scanner", path: "/scan", icon: <QrCode size={18}/> },
-      { name: "Complaints", path: "/complaints", icon: <Wrench size={18}/> }
+      {
+        name: "Dashboard",
+        path: "/warden-dashboard",
+        icon: <LayoutDashboard size={18}/>
+      },
+
+      {
+        name: "QR Scanner",
+        path: "/scan",
+        icon: <QrCode size={18}/>
+      },
+
+      {
+        name: "Complaints",
+        path: "/complaints",
+        icon: <Wrench size={18}/>
+      }
     ],
 
     student: [
-      { name: "Dashboard", path: "/student-dashboard", icon: <LayoutDashboard size={18}/> },
-      { name: "My Complaints", path: "/my-complaints", icon: <Wrench size={18}/> },
-      { name: "My QR Code", path: "/qr", icon: <QrCode size={18}/> }
+      {
+        name: "Dashboard",
+        path: "/student-dashboard",
+        icon: <LayoutDashboard size={18}/>
+      },
+
+      {
+        name: "My Complaints",
+        path: "/my-complaints",
+        icon: <Wrench size={18}/>
+      },
+
+      {
+        name: "My QR Code",
+        path: "/qr",
+        icon: <QrCode size={18}/>
+      }
     ]
   };
 

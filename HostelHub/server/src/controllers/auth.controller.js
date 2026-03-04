@@ -1,37 +1,47 @@
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Admin from "../models/Admin.js";
-import Student from "../models/Student.js";
-import Warden from "../models/Warden.js";
+import bcrypt from "bcryptjs";
+import Admin from "../models/Admin.js"; // adjust if needed
 
-export const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  const user =
-    (await Admin.findOne({ email })) ||
-    (await Student.findOne({ email })) ||
-    (await Warden.findOne({ email }));
-
-  if (!user) return res.status(400).json({ message: "User not found" });
-
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(400).json({ message: "Invalid password" });
-
-  const token = jwt.sign(
-    { id: user._id, role: user.role || "student" },
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      role: user.role,
+    },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
-
-  res.cookie("token", token, { httpOnly: true });
-
-  // Remove password from response safely
-  const { password: hashedPassword, ...userData } = user._doc;
-
-  res.json(userData);
 };
 
-export const logout = (req, res) => {
-  res.clearCookie("token");
-  res.json({ message: "Logged out" });
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await Admin.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+
+    const token = generateToken(user);
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

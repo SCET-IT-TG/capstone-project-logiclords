@@ -5,7 +5,6 @@ import { Eye, EyeOff } from "lucide-react";
 import logo from "../assets/logo.png";
 
 export default function Login() {
-
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -20,22 +19,10 @@ export default function Login() {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // 🔥 VERY IMPORTANT
 
-    if (!email && !password) {
-      alert("❌ Email and Password both incorrect");
-      triggerErrorAnimation();
-      return;
-    }
-
-    if (!email) {
-      alert("❌ Email incorrect");
-      triggerErrorAnimation();
-      return;
-    }
-
-    if (!password) {
-      alert("❌ Password incorrect");
+    if (!email || !password) {
+      alert("❌ Email and Password are required");
       triggerErrorAnimation();
       return;
     }
@@ -45,13 +32,16 @@ export default function Login() {
 
       const res = await axios.post(
         "http://localhost:5000/api/auth/login",
-        { email, password },
-        { withCredentials: true } // 🔥 important
+        { email, password }
       );
 
-      const user = res.data; // backend returns user directly
+      console.log("LOGIN RESPONSE:", res.data);
 
-      // Save user in localStorage
+      // 🔥 Correct backend structure handling
+      const { token, user } = res.data;
+
+      // Save token & user
+      localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
       // Redirect based on role
@@ -65,8 +55,8 @@ export default function Login() {
 
     } catch (err) {
       alert(
-        err?.response?.data?.message || 
-        "Invalid Email Id or Password"
+        err?.response?.data?.message ||
+        "Invalid Email or Password"
       );
       triggerErrorAnimation();
     } finally {
@@ -89,7 +79,7 @@ export default function Login() {
           <img
             src={logo}
             alt="HostelHub Logo"
-            className="w-200 h-100 object-contain mb-2"
+            className="w-40 h-20 object-contain mb-2"
           />
           <h2 className="text-2xl font-bold text-gray-800">
             Login
@@ -108,6 +98,7 @@ export default function Login() {
             focus:ring-2 focus:ring-indigo-500
             focus:outline-none transition"
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           {/* Password */}
@@ -120,6 +111,7 @@ export default function Login() {
               focus:ring-2 focus:ring-indigo-500
               focus:outline-none transition"
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
 
             <button
@@ -131,7 +123,7 @@ export default function Login() {
             </button>
           </div>
 
-          {/* Button */}
+          {/* Login Button */}
           <button
             type="submit"
             disabled={loading}
