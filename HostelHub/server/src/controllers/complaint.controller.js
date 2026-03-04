@@ -1,21 +1,120 @@
 import Complaint from "../models/Complaint.js";
 
+
+// ================= CREATE COMPLAINT =================
 export const createComplaint = async (req, res) => {
-  const complaint = await Complaint.create(req.body);
-  res.json(complaint);
+
+  try {
+
+    const { complaint } = req.body;
+
+    if (!complaint) {
+      return res.status(400).json({ message: "Complaint text required" });
+    }
+
+    const role = req.user.role;
+
+    if (role !== "student" && role !== "warden") {
+      return res.status(403).json({ message: "Only student or warden can create complaints" });
+    }
+
+    const model = role === "warden" ? "Warden" : "Student";
+
+    const newComplaint = new Complaint({
+      created_by: req.user.id,
+      created_by_model: model,
+      complaint: complaint,
+      status: "Pending"
+    });
+
+    await newComplaint.save();
+
+    res.status(201).json({
+      message: "Complaint submitted successfully",
+      complaint: newComplaint
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
+
+  }
+
 };
 
+
+
+// ================= GET ALL COMPLAINTS =================
 export const getComplaints = async (req, res) => {
-  const complaints = await Complaint.find()
-    .populate("student_id")
-    .populate("warden_id");
-  res.json(complaints);
+
+  try {
+
+    const complaints = await Complaint.find()
+
+      .populate({
+        path: "created_by",
+        select: "first_name last_name name student_id warden_id mobile_number"
+      })
+
+      .sort({ createdAt: -1 }); // newest first
+
+
+    res.status(200).json(complaints);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch complaints"
+    });
+
+  }
+
 };
 
-export const resolveComplaint = async (req, res) => {
-  const complaint = await Complaint.findById(req.params.id);
-  complaint.complaint_status = "resolved";
-  complaint.resolution_date = new Date();
-  await complaint.save();
-  res.json(complaint);
+
+
+// ================= UPDATE STATUS =================
+export const updateComplaintStatus = async (req, res) => {
+
+  try {
+
+    const { status } = req.body;
+
+    const role = req.user.role;
+
+    if (role !== "admin" && role !== "warden") {
+      return res.status(403).json({ message: "Only admin or warden can update status" });
+    }
+
+    const complaint = await Complaint.findById(req.params.id);
+
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found" });
+    }
+
+    complaint.status = status;
+
+    await complaint.save();
+
+    res.json({
+      message: "Status updated successfully",
+      complaint
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
+
+  }
+
 };

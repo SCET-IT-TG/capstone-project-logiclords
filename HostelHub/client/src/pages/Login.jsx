@@ -19,7 +19,7 @@ export default function Login() {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // 🔥 VERY IMPORTANT
+    e.preventDefault(); // Prevent page refresh
 
     if (!email || !password) {
       alert("❌ Email and Password are required");
@@ -32,15 +32,19 @@ export default function Login() {
 
       const res = await axios.post(
         "http://localhost:5000/api/auth/login",
-        { email, password }
+        { email, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       console.log("LOGIN RESPONSE:", res.data);
 
-      // 🔥 Correct backend structure handling
       const { token, user } = res.data;
 
-      // Save token & user
+      // Save login data
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
@@ -54,10 +58,8 @@ export default function Login() {
       }
 
     } catch (err) {
-      alert(
-        err?.response?.data?.message ||
-        "Invalid Email or Password"
-      );
+      console.error(err);
+      alert(err?.response?.data?.message || "❌ Invalid Email or Password");
       triggerErrorAnimation();
     } finally {
       setLoading(false);
@@ -65,15 +67,15 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center
-      bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-500">
-
+    <div
+      className="min-h-screen flex items-center justify-center
+      bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-500"
+    >
       <div
         className={`backdrop-blur-lg bg-white/90 shadow-2xl
         rounded-2xl p-8 w-[380px] transition-all duration-300
         ${shake ? "animate-shake" : ""}`}
       >
-
         {/* Logo */}
         <div className="flex flex-col items-center mb-6">
           <img
@@ -81,12 +83,10 @@ export default function Login() {
             alt="HostelHub Logo"
             className="w-40 h-20 object-contain mb-2"
           />
-          <h2 className="text-2xl font-bold text-gray-800">
-            Login
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">Login</h2>
         </div>
 
-        {/* Form */}
+        {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-4">
 
           {/* Email */}
@@ -119,7 +119,7 @@ export default function Login() {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-3 text-gray-500"
             >
-              {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
@@ -134,6 +134,7 @@ export default function Login() {
             {loading ? "Logging in..." : "Login"}
           </button>
 
+          {/* Forgot Password */}
           <div className="text-center">
             <Link
               to="/forgot-password"

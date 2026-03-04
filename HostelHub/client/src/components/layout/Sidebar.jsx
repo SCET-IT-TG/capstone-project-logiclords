@@ -21,10 +21,12 @@ export default function Sidebar() {
   // Prevent crash if user not loaded
   if (!user) return null;
 
-  // ✅ Role Based Menu
+  // ================= ROLE BASED MENU =================
+
   const menu = {
 
     admin: [
+
       {
         name: "Dashboard",
         path: "/admin-dashboard",
@@ -37,7 +39,6 @@ export default function Sidebar() {
         icon: <Users size={18}/>
       },
 
-      // ✅ FIXED ROUTE
       {
         name: "Register Warden",
         path: "/admin/create-warden",
@@ -49,9 +50,12 @@ export default function Sidebar() {
         path: "/complaints",
         icon: <Wrench size={18}/>
       }
+
     ],
 
+
     warden: [
+
       {
         name: "Dashboard",
         path: "/warden-dashboard",
@@ -69,9 +73,12 @@ export default function Sidebar() {
         path: "/complaints",
         icon: <Wrench size={18}/>
       }
+
     ],
 
+
     student: [
+
       {
         name: "Dashboard",
         path: "/student-dashboard",
@@ -79,8 +86,8 @@ export default function Sidebar() {
       },
 
       {
-        name: "My Complaints",
-        path: "/my-complaints",
+        name: "Complaints",
+        path: "/complaints",
         icon: <Wrench size={18}/>
       },
 
@@ -89,31 +96,45 @@ export default function Sidebar() {
         path: "/qr",
         icon: <QrCode size={18}/>
       }
+
     ]
+
   };
 
-  // ✅ Logout Function
+
+  // ================= LOGOUT FUNCTION =================
+
   const logout = () => {
+
     localStorage.clear();
     navigate("/login");
+
   };
 
+
   return (
+
     <div className="w-64 min-h-screen bg-indigo-600 text-white flex flex-col p-5">
 
       {/* ================= LOGO ================= */}
+
       <div className="flex justify-center mb-8">
+
         <img
           src={logo}
           alt="HostelHub Logo"
           className="w-80 h-30 object-contain transition-transform hover:scale-105"
         />
+
       </div>
 
+
       {/* ================= MENU ================= */}
+
       <div className="flex-1 space-y-2">
 
         {menu[user.role]?.map((item) => (
+
           <Link
             key={item.path}
             to={item.path}
@@ -124,14 +145,20 @@ export default function Sidebar() {
                 : "hover:bg-indigo-500"
             }`}
           >
+
             {item.icon}
+
             <span>{item.name}</span>
+
           </Link>
+
         ))}
 
       </div>
 
+
       {/* ================= BOTTOM SECTION ================= */}
+
       <div className="border-t border-indigo-400 pt-4 space-y-2">
 
         <Link
@@ -141,6 +168,7 @@ export default function Sidebar() {
           <Settings size={18}/>
           Settings
         </Link>
+
 
         <button
           onClick={logout}
@@ -153,5 +181,7 @@ export default function Sidebar() {
       </div>
 
     </div>
+
   );
+
 }

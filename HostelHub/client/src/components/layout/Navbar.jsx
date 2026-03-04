@@ -38,16 +38,28 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  // 🔥 Get First Name from DB safely
-  let firstName = "User";
+  // 🔥 Get Full Name safely
+  let fullName = "User";
+  let firstName = "U";
 
-  if (user?.first_name) {
+  if (user?.first_name && user?.last_name) {
+    fullName = `${user.first_name} ${user.last_name}`;
     firstName = user.first_name;
-  } else if (user?.name) {
+  } 
+  else if (user?.first_name) {
+    fullName = user.first_name;
+    firstName = user.first_name;
+  } 
+  else if (user?.name) {
+    fullName = user.name;
     firstName = user.name.split(" ")[0];
-  } else if (user?.admin_name) {
+  } 
+  else if (user?.admin_name) {
+    fullName = user.admin_name;
     firstName = user.admin_name.split(" ")[0];
-  } else if (user?.username) {
+  } 
+  else if (user?.username) {
+    fullName = user.username;
     firstName = user.username;
   }
 
@@ -57,7 +69,7 @@ export default function Navbar() {
       {/* LEFT */}
       <div>
         <h2 className="text-lg font-semibold">
-          Welcome, {firstName}
+          Welcome, {fullName}
         </h2>
 
         <p className="text-sm text-gray-500 dark:text-gray-400">

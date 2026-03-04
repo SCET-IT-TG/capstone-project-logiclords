@@ -18,6 +18,7 @@ import feeRoutes from "./src/routes/fee.routes.js";
 import visitorRoutes from "./src/routes/visitor.routes.js";
 import qrRoutes from "./src/routes/qr.routes.js";
 
+
 connectDB();
 
 const app = express();

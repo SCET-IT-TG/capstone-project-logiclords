@@ -1,20 +1,28 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
 import Login from "./pages/Login";
 import QRScanner from "./pages/QRScanner";
+
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import WardenDashboard from "./pages/dashboard/WardenDashboard";
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
+
 import CreateStudent from "./components/forms/StudentForm";
 import WardenForm from "./components/forms/WardenForm";
+
+import ComplaintPage from "./pages/complaints/ComplaintPage"; // ✅ IMPORT
+
+
 // 🔐 Protected Route with Role Support
 const ProtectedRoute = ({ children, allowedRoles }) => {
+
   const user = JSON.parse(localStorage.getItem("user"));
 
   if (!user) {
     return <Navigate to="/login" />;
   }
 
-  // If role restriction exists
+  // Role restriction
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/login" />;
   }
@@ -22,16 +30,22 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+
 function App() {
+
   return (
+
     <BrowserRouter>
+
       <Routes>
 
         {/* Login Routes */}
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Admin Routes */}
+
+        {/* ================= ADMIN ================= */}
+
         <Route
           path="/admin-dashboard"
           element={
@@ -50,7 +64,18 @@ function App() {
           }
         />
 
-        {/* Warden Routes */}
+        <Route
+          path="/admin/create-warden"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <WardenForm />
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* ================= WARDEN ================= */}
+
         <Route
           path="/warden-dashboard"
           element={
@@ -60,7 +85,9 @@ function App() {
           }
         />
 
-        {/* Student Routes */}
+
+        {/* ================= STUDENT ================= */}
+
         <Route
           path="/student-dashboard"
           element={
@@ -69,9 +96,10 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/admin/create-warden" element={<WardenForm />} />
 
-        {/* QR Scanner */}
+
+        {/* ================= QR SCANNER ================= */}
+
         <Route
           path="/scan"
           element={
@@ -81,12 +109,29 @@ function App() {
           }
         />
 
-        {/* 404 Page */}
+
+        {/* ================= COMPLAINT PAGE ================= */}
+
+        <Route
+          path="/complaints"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "warden", "student"]}>
+              <ComplaintPage />
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* ================= 404 ================= */}
+
         <Route path="*" element={<h2>404 - Page Not Found</h2>} />
 
       </Routes>
+
     </BrowserRouter>
+
   );
+
 }
 
 export default App;
