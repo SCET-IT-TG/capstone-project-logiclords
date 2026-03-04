@@ -3,14 +3,21 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import QRScanner from "./pages/QRScanner";
 
+// Dashboards
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import WardenDashboard from "./pages/dashboard/WardenDashboard";
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
 
+// Forms
 import CreateStudent from "./components/forms/StudentForm";
 import WardenForm from "./components/forms/WardenForm";
 
-import ComplaintPage from "./pages/complaints/ComplaintPage"; // ✅ IMPORT
+// Complaints
+import ComplaintPage from "./pages/complaints/ComplaintPage";
+
+// Fee Pages
+import FeeManagement from "./pages/FeeManagement";
+import FeeStatus from "./pages/FeeStatus";
 
 
 // 🔐 Protected Route with Role Support
@@ -22,7 +29,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" />;
   }
 
-  // Role restriction
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/login" />;
   }
@@ -39,7 +45,8 @@ function App() {
 
       <Routes>
 
-        {/* Login Routes */}
+        {/* ================= LOGIN ================= */}
+
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
 
@@ -73,6 +80,15 @@ function App() {
           }
         />
 
+        <Route
+          path="/admin-fees"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <FeeManagement />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* ================= WARDEN ================= */}
 
@@ -85,6 +101,15 @@ function App() {
           }
         />
 
+        <Route
+          path="/warden-complaints"
+          element={
+            <ProtectedRoute allowedRoles={["warden"]}>
+              <ComplaintPage />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* ================= STUDENT ================= */}
 
@@ -93,6 +118,24 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student-fee"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <FeeStatus />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/student-complaints"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <ComplaintPage />
             </ProtectedRoute>
           }
         />
@@ -110,7 +153,7 @@ function App() {
         />
 
 
-        {/* ================= COMPLAINT PAGE ================= */}
+        {/* ================= COMMON COMPLAINT PAGE ================= */}
 
         <Route
           path="/complaints"

@@ -6,20 +6,30 @@ import {
   QrCode,
   Wrench,
   Settings,
-  LogOut
+  LogOut,
+  DollarSign
 } from "lucide-react";
 
-// ✅ IMPORT LOGO
 import logo from "../../assets/logo.png";
 
 export default function Sidebar() {
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const storedUser = localStorage.getItem("user");
+
+  let user = null;
+
+  try {
+    user = storedUser ? JSON.parse(storedUser) : null;
+  } catch (error) {
+    console.error("Invalid user data");
+    localStorage.removeItem("user");
+  }
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Prevent crash if user not loaded
   if (!user) return null;
+
 
   // ================= ROLE BASED MENU =================
 
@@ -43,6 +53,12 @@ export default function Sidebar() {
         name: "Register Warden",
         path: "/admin/create-warden",
         icon: <UserCog size={18}/>
+      },
+
+      {
+        name: "Fee Management",
+        path: "/admin-fees",
+        icon: <DollarSign size={18}/>
       },
 
       {
@@ -86,6 +102,12 @@ export default function Sidebar() {
       },
 
       {
+        name: "My Fees",
+        path: "/student-fee",
+        icon: <DollarSign size={18}/>
+      },
+
+      {
         name: "Complaints",
         path: "/complaints",
         icon: <Wrench size={18}/>
@@ -102,7 +124,7 @@ export default function Sidebar() {
   };
 
 
-  // ================= LOGOUT FUNCTION =================
+  // ================= LOGOUT =================
 
   const logout = () => {
 
@@ -116,8 +138,7 @@ export default function Sidebar() {
 
     <div className="w-64 min-h-screen bg-indigo-600 text-white flex flex-col p-5">
 
-      {/* ================= LOGO ================= */}
-
+      {/* LOGO */}
       <div className="flex justify-center mb-8">
 
         <img
@@ -129,8 +150,7 @@ export default function Sidebar() {
       </div>
 
 
-      {/* ================= MENU ================= */}
-
+      {/* MENU */}
       <div className="flex-1 space-y-2">
 
         {menu[user.role]?.map((item) => (
@@ -157,8 +177,7 @@ export default function Sidebar() {
       </div>
 
 
-      {/* ================= BOTTOM SECTION ================= */}
-
+      {/* BOTTOM */}
       <div className="border-t border-indigo-400 pt-4 space-y-2">
 
         <Link

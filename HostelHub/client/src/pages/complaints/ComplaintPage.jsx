@@ -8,9 +8,10 @@ const ComplaintPage = () => {
 
   const [complaints, setComplaints] = useState([]);
   const [text, setText] = useState("");
+  const [remarks, setRemarks] = useState({});
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const token = user?.token;
+  const token = localStorage.getItem("token");
   const role = user?.role;
 
   const fetchComplaints = async () => {
@@ -56,7 +57,7 @@ const ComplaintPage = () => {
 
     await axios.put(
       `http://localhost:5000/api/complaints/${id}`,
-      { status },
+      { status, remark: remarks[id] },
       {
         headers: { Authorization: `Bearer ${token}` }
       }
@@ -69,21 +70,17 @@ const ComplaintPage = () => {
 
     <div className="flex">
 
-      {/* Sidebar */}
       <Sidebar />
 
       <div className="flex-1 flex flex-col">
 
-        {/* Navbar */}
         <Navbar />
 
-        {/* Page Content */}
         <div className="p-6 bg-gray-100 min-h-screen">
 
           <h2 className="text-2xl font-bold mb-6">
             Complaint Management
           </h2>
-
 
           {(role === "student" || role === "warden") && (
 
@@ -107,7 +104,6 @@ const ComplaintPage = () => {
 
           )}
 
-
           <div className="bg-white p-4 rounded shadow">
 
             <table className="w-full border">
@@ -115,19 +111,19 @@ const ComplaintPage = () => {
               <thead className="bg-gray-200">
 
                 <tr>
-                  <th className="border p-2">#</th>
+                  <th className="border p-2">Complaint No</th>
+                  <th className="border p-2">User ID</th>
                   <th className="border p-2">Name</th>
-                  <th className="border p-2">ID</th>
                   <th className="border p-2">Mobile</th>
                   <th className="border p-2">Complaint</th>
                   <th className="border p-2">Status</th>
+                  <th className="border p-2">Remark</th>
 
                   {(role === "admin" || role === "warden") &&
                     <th className="border p-2">Action</th>}
                 </tr>
 
               </thead>
-
 
               <tbody>
 
@@ -138,22 +134,31 @@ const ComplaintPage = () => {
                   const name =
                     person?.first_name
                       ? `${person.first_name} ${person.last_name}`
-                      : person?.name;
+                      : person?.name || "Unknown";
 
                   const id =
-                    person?.student_id || person?.warden_id;
+                    person?.student_id ||
+                    person?.warden_id ||
+                    person?.admin_id ||
+                    person?._id;
 
                   const mobile =
-                    person?.mobile_number;
+                    person?.mobile_number || "-";
 
                   return (
 
                     <tr key={c._id} className="text-center">
 
-                      <td className="border p-2">{index + 1}</td>
-                      <td className="border p-2">{name}</td>
+                      <td className="border p-2">
+                        CMP-{index + 1}
+                      </td>
+
                       <td className="border p-2">{id}</td>
+
+                      <td className="border p-2">{name}</td>
+
                       <td className="border p-2">{mobile}</td>
+
                       <td className="border p-2">{c.complaint}</td>
 
                       <td className="border p-2">
@@ -175,10 +180,26 @@ const ComplaintPage = () => {
 
                       </td>
 
+                      <td className="border p-2">
+                        {c.remark || "-"}
+                      </td>
 
                       {(role === "admin" || role === "warden") && (
 
                         <td className="border p-2">
+
+                          <input
+                            type="text"
+                            placeholder="Remark"
+                            className="border p-1 mr-2"
+                            value={remarks[c._id] || ""}
+                            onChange={(e) =>
+                              setRemarks({
+                                ...remarks,
+                                [c._id]: e.target.value
+                              })
+                            }
+                          />
 
                           <button
                             className="bg-blue-500 text-white px-2 py-1 rounded mr-2"

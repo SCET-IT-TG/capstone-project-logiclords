@@ -1,25 +1,24 @@
 import express from "express";
+
 import {
-  createTransaction,
-  getTransactions,
+  getAllFees,
+  payFee,
+  paymentHistory,
+  studentFeeStatus
 } from "../controllers/fee.controller.js";
+
 import { protect } from "../middleware/auth.middleware.js";
-import { authorize } from "../middleware/role.middleware.js";
 
 const router = express.Router();
 
-router.post(
-  "/",
-  protect,
-  authorize("admin"),
-  createTransaction
-);
 
-router.get(
-  "/",
-  protect,
-  authorize("admin"),
-  getTransactions
-);
+// Admin routes
+router.get("/admin", protect, getAllFees);
+router.post("/pay", protect, payFee);
+router.get("/history", protect, paymentHistory);
+
+
+// Student route
+router.get("/student", protect, studentFeeStatus);
 
 export default router;
