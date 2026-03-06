@@ -1,25 +1,29 @@
 import express from "express";
+
 import {
-  createVisitor,
-  getVisitors,
-} from "../controllers/visitor.controller.js";
-import { protect } from "../middleware/auth.middleware.js";
-import { authorize } from "../middleware/role.middleware.js";
+createVisitor,
+getVisitors,
+getStudentVisitors,
+approveVisitor,
+checkInVisitor,
+checkOutVisitor
+}
+from "../controllers/visitor.controller.js";
+
+import {protect} from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post(
-  "/",
-  protect,
-  authorize("warden"),
-  createVisitor
-);
+router.post("/",protect,createVisitor);
 
-router.get(
-  "/",
-  protect,
-  authorize("admin", "warden"),
-  getVisitors
-);
+router.get("/",protect,getVisitors);
+
+router.get("/student",protect,getStudentVisitors);
+
+router.put("/approve/:id",protect,approveVisitor);
+
+router.put("/checkin/:id",protect,checkInVisitor);
+
+router.put("/checkout/:id",protect,checkOutVisitor);
 
 export default router;

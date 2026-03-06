@@ -19,6 +19,10 @@ import ComplaintPage from "./pages/complaints/ComplaintPage";
 import FeeManagement from "./pages/FeeManagement";
 import FeeStatus from "./pages/FeeStatus";
 
+// Visitor Pages
+import VisitorPage from "./pages/visitors/VisitorPage";
+import StudentVisitors from "./pages/visitors/StudentVisitors";
+
 
 // 🔐 Protected Route with Role Support
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -89,6 +93,16 @@ function App() {
           }
         />
 
+        {/* NEW VISITOR PAGE FOR ADMIN/WARDEN */}
+        <Route
+          path="/visitors"
+          element={
+            <ProtectedRoute allowedRoles={["admin","warden"]}>
+              <VisitorPage />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* ================= WARDEN ================= */}
 
@@ -136,6 +150,16 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <ComplaintPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* STUDENT VISITOR PAGE */}
+        <Route
+          path="/student-visitors"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <StudentVisitors />
             </ProtectedRoute>
           }
         />

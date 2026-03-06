@@ -62,6 +62,12 @@ export default function Sidebar() {
       },
 
       {
+        name: "Visitors",
+        path: "/visitors",
+        icon: <Users size={18}/>
+      },
+
+      {
         name: "Complaints",
         path: "/complaints",
         icon: <Wrench size={18}/>
@@ -85,6 +91,12 @@ export default function Sidebar() {
       },
 
       {
+        name: "Visitors",
+        path: "/visitors",
+        icon: <Users size={18}/>
+      },
+
+      {
         name: "Complaints",
         path: "/complaints",
         icon: <Wrench size={18}/>
@@ -105,6 +117,12 @@ export default function Sidebar() {
         name: "My Fees",
         path: "/student-fee",
         icon: <DollarSign size={18}/>
+      },
+
+      {
+        name: "My Visitors",
+        path: "/student-visitors",
+        icon: <Users size={18}/>
       },
 
       {
