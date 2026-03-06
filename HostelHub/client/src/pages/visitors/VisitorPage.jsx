@@ -13,13 +13,14 @@ export default function VisitorPage() {
   const [filterNoRoom, setFilterNoRoom] = useState(false);
 
   const [form, setForm] = useState({
-    visitor_name: "",
-    mobile_number: "",
-    room_no: "",
-    student: "",
-    visit_date: "",
-    purpose: ""
+    visitor_name:"",
+    mobile_number:"",
+    room_no:"",
+    student:"",
+    visit_date:"",
+    purpose:""
   });
+
 
   // ================= FETCH VISITORS =================
 
@@ -27,9 +28,7 @@ export default function VisitorPage() {
 
     const res = await axios.get(
       "http://localhost:5000/api/visitors",
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+      { headers:{Authorization:`Bearer ${token}`} }
     );
 
     setVisitors(res.data);
@@ -43,9 +42,7 @@ export default function VisitorPage() {
 
     const res = await axios.get(
       "http://localhost:5000/api/students",
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+      { headers:{Authorization:`Bearer ${token}`} }
     );
 
     setStudents(res.data);
@@ -53,37 +50,35 @@ export default function VisitorPage() {
   };
 
 
-  useEffect(() => {
+  useEffect(()=>{
 
     fetchVisitors();
     fetchStudents();
 
-  }, []);
+  },[]);
 
 
   // ================= ADD VISITOR =================
 
   const addVisitor = async () => {
 
-    if (!form.visitor_name || !form.mobile_number || !form.visit_date) {
+    if(!form.visitor_name || !form.mobile_number || !form.visit_date){
       return alert("Fill required fields");
     }
 
     await axios.post(
       "http://localhost:5000/api/visitors",
       form,
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+      {headers:{Authorization:`Bearer ${token}`}}
     );
 
     setForm({
-      visitor_name: "",
-      mobile_number: "",
-      room_no: "",
-      student: "",
-      visit_date: "",
-      purpose: ""
+      visitor_name:"",
+      mobile_number:"",
+      room_no:"",
+      student:"",
+      visit_date:"",
+      purpose:""
     });
 
     fetchVisitors();
@@ -91,44 +86,38 @@ export default function VisitorPage() {
   };
 
 
-  // ================= APPROVE VISITOR =================
+  // ================= ACTIONS =================
 
-  const approveVisitor = async (id) => {
+  const approveVisitor = async(id)=>{
 
     await axios.put(
       `http://localhost:5000/api/visitors/approve/${id}`,
       {},
-      { headers: { Authorization: `Bearer ${token}` } }
+      {headers:{Authorization:`Bearer ${token}`}}
     );
 
     fetchVisitors();
 
   };
 
-
-  // ================= CHECK IN =================
-
-  const checkInVisitor = async (id) => {
+  const checkInVisitor = async(id)=>{
 
     await axios.put(
       `http://localhost:5000/api/visitors/checkin/${id}`,
       {},
-      { headers: { Authorization: `Bearer ${token}` } }
+      {headers:{Authorization:`Bearer ${token}`}}
     );
 
     fetchVisitors();
 
   };
 
-
-  // ================= CHECK OUT =================
-
-  const checkOutVisitor = async (id) => {
+  const checkOutVisitor = async(id)=>{
 
     await axios.put(
       `http://localhost:5000/api/visitors/checkout/${id}`,
       {},
-      { headers: { Authorization: `Bearer ${token}` } }
+      {headers:{Authorization:`Bearer ${token}`}}
     );
 
     fetchVisitors();
@@ -137,7 +126,7 @@ export default function VisitorPage() {
 
 
   const filteredVisitors = filterNoRoom
-    ? visitors.filter(v => !v.room_no)
+    ? visitors.filter(v=>!v.room_no)
     : visitors;
 
 
@@ -158,7 +147,7 @@ export default function VisitorPage() {
           </h2>
 
 
-          {/* ================= ADD VISITOR FORM ================= */}
+          {/* ADD VISITOR FORM */}
 
           <div className="bg-white p-5 rounded-xl shadow mb-6">
 
@@ -193,7 +182,7 @@ export default function VisitorPage() {
 
               <input
                 type="text"
-                placeholder="Room No (optional)"
+                placeholder="Room No"
                 value={form.room_no}
                 onChange={(e)=>setForm({...form,room_no:e.target.value})}
                 className="border p-2 rounded"
@@ -235,21 +224,17 @@ export default function VisitorPage() {
           </div>
 
 
-          {/* ================= FILTER ================= */}
+          {/* FILTER */}
 
-          <div className="mb-4">
-
-            <button
-              onClick={()=>setFilterNoRoom(!filterNoRoom)}
-              className="bg-yellow-500 text-white px-4 py-2 rounded"
-            >
-              {filterNoRoom ? "Show All Visitors" : "Visitors Without Room"}
-            </button>
-
-          </div>
+          <button
+            onClick={()=>setFilterNoRoom(!filterNoRoom)}
+            className="bg-yellow-500 text-white px-4 py-2 rounded mb-4"
+          >
+            {filterNoRoom ? "Show All Visitors" : "Visitors Without Room"}
+          </button>
 
 
-          {/* ================= VISITOR TABLE ================= */}
+          {/* VISITOR TABLE */}
 
           <div className="bg-white rounded-xl shadow overflow-x-auto">
 
@@ -264,6 +249,8 @@ export default function VisitorPage() {
                   <th className="p-3">Student</th>
                   <th className="p-3">Visit Date</th>
                   <th className="p-3">Status</th>
+                  <th className="p-3">Check-IN</th>
+                  <th className="p-3">Check-OUT</th>
                   <th className="p-3">Action</th>
                 </tr>
 
@@ -275,17 +262,9 @@ export default function VisitorPage() {
 
                   <tr key={v._id} className="border-b">
 
-                    <td className="p-3">
-                      {v.visitor_name}
-                    </td>
-
-                    <td className="p-3">
-                      {v.mobile_number}
-                    </td>
-
-                    <td className="p-3">
-                      {v.room_no || "-"}
-                    </td>
+                    <td className="p-3">{v.visitor_name}</td>
+                    <td className="p-3">{v.mobile_number}</td>
+                    <td className="p-3">{v.room_no || "-"}</td>
 
                     <td className="p-3">
                       {v.student
@@ -309,9 +288,23 @@ export default function VisitorPage() {
                       }
 
                       {v.status === "OUT" &&
-                        <span className="text-green-600">Checked Out</span>
+                        <span className="text-green-600">Completed</span>
                       }
 
+                    </td>
+
+                    <td className="p-3">
+                      {v.check_in
+                        ? new Date(v.check_in).toLocaleTimeString()
+                        : "-"
+                      }
+                    </td>
+
+                    <td className="p-3">
+                      {v.check_out
+                        ? new Date(v.check_out).toLocaleTimeString()
+                        : "-"
+                      }
                     </td>
 
                     <td className="p-3 space-x-2">
@@ -325,7 +318,7 @@ export default function VisitorPage() {
                         </button>
                       )}
 
-                      {v.status === "PENDING" && v.approved && (
+                      {v.status==="PENDING" && v.approved && (
                         <button
                           onClick={()=>checkInVisitor(v._id)}
                           className="bg-blue-500 text-white px-2 py-1 rounded"
@@ -334,7 +327,7 @@ export default function VisitorPage() {
                         </button>
                       )}
 
-                      {v.status === "IN" && (
+                      {v.status==="IN" && (
                         <button
                           onClick={()=>checkOutVisitor(v._id)}
                           className="bg-red-500 text-white px-2 py-1 rounded"

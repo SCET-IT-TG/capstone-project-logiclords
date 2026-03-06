@@ -2,178 +2,248 @@ import Visitor from "../models/Visitor.js";
 import Student from "../models/Student.js";
 
 
-// CREATE VISITOR (ADMIN/WARDEN/STUDENT)
+// ================= CREATE VISITOR =================
 
-export const createVisitor = async(req,res)=>{
+export const createVisitor = async (req, res) => {
 
-try{
+  try {
 
-const {visitor_name,mobile_number,room_no,student,visit_date,purpose} = req.body;
+    const {
+      visitor_name,
+      mobile_number,
+      room_no,
+      student,
+      visit_date,
+      purpose
+    } = req.body;
 
-const role = req.user.role;
+    const role = req.user.role;
 
-const visitor = new Visitor({
+    // 🔹 Generate Visitor ID automatically
+    const count = await Visitor.countDocuments();
+    const visitor_id = "VIS" + String(count + 1).padStart(3, "0");
 
-visitor_name,
-mobile_number,
-room_no: room_no || null,
-student: student || null,
-visit_date,
-purpose,
-created_by:req.user.id,
-created_by_model: role === "student" ? "Student" : role === "warden" ? "Warden" : "Admin",
-approved: role === "student" ? false : true
+    const visitor = new Visitor({
 
-});
+      visitor_id,   // 🔥 auto generated id
 
-await visitor.save();
+      visitor_name,
+      mobile_number,
 
-res.status(201).json(visitor);
+      // room optional
+      room_no: room_no || null,
 
-}
-catch(err){
+      // if student not provided → assign logged in student
+      student: student || req.user.id,
 
-res.status(500).json({message:err.message});
+      visit_date,
+      purpose,
 
-}
+      created_by: req.user.id,
 
-};
+      created_by_model:
+        role === "student"
+          ? "Student"
+          : role === "warden"
+          ? "Warden"
+          : "Admin",
 
+      // student requests require approval
+      approved: role === "student" ? false : true,
 
+      status: "PENDING"
 
+    });
 
-// GET ALL VISITORS (ADMIN / WARDEN)
+    await visitor.save();
 
-export const getVisitors = async(req,res)=>{
+    res.status(201).json({
+      message: "Visitor request submitted",
+      visitor
+    });
 
-try{
+  } catch (error) {
 
-const visitors = await Visitor.find()
-.populate("student","first_name last_name student_id room_no")
-.sort({createdAt:-1});
+    console.log("VISITOR CREATE ERROR:", error);
 
-res.json(visitors);
+    res.status(500).json({
+      message: "Server error"
+    });
 
-}
-catch(err){
-
-res.status(500).json({message:err.message});
-
-}
-
-};
-
-
-
-
-// GET STUDENT VISITORS
-
-export const getStudentVisitors = async(req,res)=>{
-
-try{
-
-const studentId = req.user.id;
-
-const student = await Student.findById(studentId);
-
-const visitors = await Visitor.find({
-
-approved:true,
-
-$or:[
-{room_no:student.room_no},
-{student:studentId}
-]
-
-});
-
-res.json(visitors);
-
-}
-catch(err){
-
-res.status(500).json({message:err.message});
-
-}
+  }
 
 };
 
 
 
+// ================= GET ALL VISITORS =================
 
-// APPROVE VISITOR
+export const getVisitors = async (req, res) => {
 
-export const approveVisitor = async(req,res)=>{
+  try {
 
-try{
+    const visitors = await Visitor.find()
+      .populate("student", "first_name last_name student_id room_no")
+      .sort({ createdAt: -1 });
 
-const visitor = await Visitor.findById(req.params.id);
+    res.json(visitors);
 
-visitor.approved=true;
+  } catch (error) {
 
-await visitor.save();
+    console.log("GET VISITORS ERROR:", error);
 
-res.json(visitor);
+    res.status(500).json({
+      message: "Server error"
+    });
 
-}
-catch(err){
-
-res.status(500).json({message:err.message});
-
-}
-
-};
-
-
-
-
-// CHECK IN
-
-export const checkInVisitor = async(req,res)=>{
-
-try{
-
-const visitor = await Visitor.findById(req.params.id);
-
-visitor.status="IN";
-visitor.check_in=new Date();
-
-await visitor.save();
-
-res.json(visitor);
-
-}
-catch(err){
-
-res.status(500).json({message:err.message});
-
-}
+  }
 
 };
 
 
 
+// ================= GET STUDENT VISITORS =================
 
-// CHECK OUT
+export const getStudentVisitors = async (req, res) => {
 
-export const checkOutVisitor = async(req,res)=>{
+  try {
 
-try{
+    const studentId = req.user.id;
 
-const visitor = await Visitor.findById(req.params.id);
+    const student = await Student.findById(studentId);
 
-visitor.status="OUT";
-visitor.check_out=new Date();
+    const visitors = await Visitor.find({
 
-await visitor.save();
+      $or: [
+        { room_no: student?.room_no },
+        { student: studentId }
+      ]
 
-res.json(visitor);
+    }).sort({ createdAt: -1 });
 
-}
-catch(err){
+    res.json(visitors);
 
-res.status(500).json({message:err.message});
+  } catch (error) {
 
-}
+    console.log("STUDENT VISITOR ERROR:", error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
+
+  }
+
+};
+
+
+
+// ================= APPROVE VISITOR =================
+
+export const approveVisitor = async (req, res) => {
+
+  try {
+
+    const visitor = await Visitor.findById(req.params.id);
+
+    if (!visitor) {
+      return res.status(404).json({
+        message: "Visitor not found"
+      });
+    }
+
+    visitor.approved = true;
+
+    await visitor.save();
+
+    res.json({
+      message: "Visitor approved",
+      visitor
+    });
+
+  } catch (error) {
+
+    console.log("APPROVE VISITOR ERROR:", error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
+
+  }
+
+};
+
+
+
+// ================= CHECK IN =================
+
+export const checkInVisitor = async (req, res) => {
+
+  try {
+
+    const visitor = await Visitor.findById(req.params.id);
+
+    if (!visitor) {
+      return res.status(404).json({
+        message: "Visitor not found"
+      });
+    }
+
+    visitor.status = "IN";
+    visitor.check_in = new Date();
+
+    await visitor.save();
+
+    res.json({
+      message: "Visitor checked in",
+      visitor
+    });
+
+  } catch (error) {
+
+    console.log("CHECKIN VISITOR ERROR:", error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
+
+  }
+
+};
+
+
+
+// ================= CHECK OUT =================
+
+export const checkOutVisitor = async (req, res) => {
+
+  try {
+
+    const visitor = await Visitor.findById(req.params.id);
+
+    if (!visitor) {
+      return res.status(404).json({
+        message: "Visitor not found"
+      });
+    }
+
+    visitor.status = "OUT";
+    visitor.check_out = new Date();
+
+    await visitor.save();
+
+    res.json({
+      message: "Visitor checked out",
+      visitor
+    });
+
+  } catch (error) {
+
+    console.log("CHECKOUT VISITOR ERROR:", error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
+
+  }
 
 };

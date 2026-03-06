@@ -4,40 +4,51 @@ import axios from "axios";
 import Sidebar from "../../components/layout/Sidebar";
 import Navbar from "../../components/layout/Navbar";
 
-export default function StudentVisitors() {
+export default function VisitorPage() {
 
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
 
   const [visitors, setVisitors] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [filterNoRoom, setFilterNoRoom] = useState(false);
 
   const [form, setForm] = useState({
     visitor_name: "",
     mobile_number: "",
+    room_no: "",
+    student: "",
     visit_date: "",
-    purpose: "",
-    room_no: ""
+    purpose: ""
   });
-
 
   // ================= FETCH VISITORS =================
 
   const fetchVisitors = async () => {
 
-    try {
+    const res = await axios.get(
+      "http://localhost:5000/api/visitors",
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
 
-      const res = await axios.get(
-        "http://localhost:5000/api/visitors/student",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+    setVisitors(res.data);
 
-      setVisitors(res.data);
+  };
 
-    } catch (error) {
-      console.log(error);
-    }
+
+  // ================= FETCH STUDENTS =================
+
+  const fetchStudents = async () => {
+
+    const res = await axios.get(
+      "http://localhost:5000/api/students",
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+
+    setStudents(res.data);
 
   };
 
@@ -45,48 +56,89 @@ export default function StudentVisitors() {
   useEffect(() => {
 
     fetchVisitors();
+    fetchStudents();
 
   }, []);
 
 
-  // ================= CREATE VISITOR REQUEST =================
+  // ================= ADD VISITOR =================
 
-  const createVisitor = async () => {
+  const addVisitor = async () => {
 
     if (!form.visitor_name || !form.mobile_number || !form.visit_date) {
       return alert("Fill required fields");
     }
 
-    try {
+    await axios.post(
+      "http://localhost:5000/api/visitors",
+      form,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
 
-      await axios.post(
-        "http://localhost:5000/api/visitors",
-        {
-          ...form,
-          student: user.id // auto assign student
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+    setForm({
+      visitor_name: "",
+      mobile_number: "",
+      room_no: "",
+      student: "",
+      visit_date: "",
+      purpose: ""
+    });
 
-      setForm({
-        visitor_name: "",
-        mobile_number: "",
-        visit_date: "",
-        purpose: "",
-        room_no: ""
-      });
-
-      fetchVisitors();
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
+    fetchVisitors();
 
   };
+
+
+  // ================= APPROVE VISITOR =================
+
+  const approveVisitor = async (id) => {
+
+    await axios.put(
+      `http://localhost:5000/api/visitors/approve/${id}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    fetchVisitors();
+
+  };
+
+
+  // ================= CHECK IN =================
+
+  const checkInVisitor = async (id) => {
+
+    await axios.put(
+      `http://localhost:5000/api/visitors/checkin/${id}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    fetchVisitors();
+
+  };
+
+
+  // ================= CHECK OUT =================
+
+  const checkOutVisitor = async (id) => {
+
+    await axios.put(
+      `http://localhost:5000/api/visitors/checkout/${id}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    fetchVisitors();
+
+  };
+
+
+  const filteredVisitors = filterNoRoom
+    ? visitors.filter(v => !v.room_no)
+    : visitors;
 
 
   return (
@@ -102,16 +154,16 @@ export default function StudentVisitors() {
         <div className="p-6 bg-gray-100 min-h-screen">
 
           <h2 className="text-2xl font-bold mb-6">
-            My Visitors
+            Visitor Management
           </h2>
 
 
-          {/* ================= VISITOR REQUEST FORM ================= */}
+          {/* ================= ADD VISITOR FORM ================= */}
 
           <div className="bg-white p-5 rounded-xl shadow mb-6">
 
             <h3 className="font-semibold mb-4">
-              Create Visitor Request
+              Add Visitor
             </h3>
 
             <div className="grid grid-cols-3 gap-4">
@@ -120,28 +172,22 @@ export default function StudentVisitors() {
                 type="text"
                 placeholder="Visitor Name"
                 value={form.visitor_name}
-                onChange={(e)=>
-                  setForm({...form,visitor_name:e.target.value})
-                }
+                onChange={(e)=>setForm({...form,visitor_name:e.target.value})}
                 className="border p-2 rounded"
               />
 
               <input
                 type="text"
-                placeholder="Mobile Number"
+                placeholder="Mobile"
                 value={form.mobile_number}
-                onChange={(e)=>
-                  setForm({...form,mobile_number:e.target.value})
-                }
+                onChange={(e)=>setForm({...form,mobile_number:e.target.value})}
                 className="border p-2 rounded"
               />
 
               <input
                 type="date"
                 value={form.visit_date}
-                onChange={(e)=>
-                  setForm({...form,visit_date:e.target.value})
-                }
+                onChange={(e)=>setForm({...form,visit_date:e.target.value})}
                 className="border p-2 rounded"
               />
 
@@ -149,35 +195,61 @@ export default function StudentVisitors() {
                 type="text"
                 placeholder="Room No (optional)"
                 value={form.room_no}
-                onChange={(e)=>
-                  setForm({...form,room_no:e.target.value})
-                }
+                onChange={(e)=>setForm({...form,room_no:e.target.value})}
                 className="border p-2 rounded"
               />
+
+              <select
+                value={form.student}
+                onChange={(e)=>setForm({...form,student:e.target.value})}
+                className="border p-2 rounded"
+              >
+
+                <option value="">Assign Student</option>
+
+                {students.map(s=>(
+                  <option key={s._id} value={s._id}>
+                    {s.first_name} {s.last_name}
+                  </option>
+                ))}
+
+              </select>
 
               <input
                 type="text"
                 placeholder="Purpose"
                 value={form.purpose}
-                onChange={(e)=>
-                  setForm({...form,purpose:e.target.value})
-                }
+                onChange={(e)=>setForm({...form,purpose:e.target.value})}
                 className="border p-2 rounded"
               />
 
             </div>
 
             <button
-              onClick={createVisitor}
+              onClick={addVisitor}
               className="mt-4 bg-indigo-600 text-white px-5 py-2 rounded"
             >
-              Submit Request
+              Add Visitor
             </button>
 
           </div>
 
 
-          {/* ================= VISITOR LIST ================= */}
+          {/* ================= FILTER ================= */}
+
+          <div className="mb-4">
+
+            <button
+              onClick={()=>setFilterNoRoom(!filterNoRoom)}
+              className="bg-yellow-500 text-white px-4 py-2 rounded"
+            >
+              {filterNoRoom ? "Show All Visitors" : "Visitors Without Room"}
+            </button>
+
+          </div>
+
+
+          {/* ================= VISITOR TABLE ================= */}
 
           <div className="bg-white rounded-xl shadow overflow-x-auto">
 
@@ -189,16 +261,17 @@ export default function StudentVisitors() {
                   <th className="p-3">Visitor</th>
                   <th className="p-3">Mobile</th>
                   <th className="p-3">Room</th>
+                  <th className="p-3">Student</th>
                   <th className="p-3">Visit Date</th>
-                  <th className="p-3">Purpose</th>
                   <th className="p-3">Status</th>
+                  <th className="p-3">Action</th>
                 </tr>
 
               </thead>
 
               <tbody>
 
-                {visitors.map(v => (
+                {filteredVisitors.map(v=>(
 
                   <tr key={v._id} className="border-b">
 
@@ -211,7 +284,14 @@ export default function StudentVisitors() {
                     </td>
 
                     <td className="p-3">
-                      {v.room_no || "Assigned to Student"}
+                      {v.room_no || "-"}
+                    </td>
+
+                    <td className="p-3">
+                      {v.student
+                        ? `${v.student.first_name} ${v.student.last_name}`
+                        : "-"
+                      }
                     </td>
 
                     <td className="p-3">
@@ -219,33 +299,48 @@ export default function StudentVisitors() {
                     </td>
 
                     <td className="p-3">
-                      {v.purpose}
+
+                      {v.status === "PENDING" &&
+                        <span className="text-yellow-600">Pending</span>
+                      }
+
+                      {v.status === "IN" &&
+                        <span className="text-blue-600">Checked In</span>
+                      }
+
+                      {v.status === "OUT" &&
+                        <span className="text-green-600">Checked Out</span>
+                      }
+
                     </td>
 
-                    <td className="p-3">
+                    <td className="p-3 space-x-2">
 
                       {!v.approved && (
-                        <span className="text-yellow-600">
-                          Pending Approval
-                        </span>
+                        <button
+                          onClick={()=>approveVisitor(v._id)}
+                          className="bg-green-500 text-white px-2 py-1 rounded"
+                        >
+                          Approve
+                        </button>
                       )}
 
-                      {v.approved && v.status === "PENDING" && (
-                        <span className="text-blue-600">
-                          Approved
-                        </span>
+                      {v.status === "PENDING" && v.approved && (
+                        <button
+                          onClick={()=>checkInVisitor(v._id)}
+                          className="bg-blue-500 text-white px-2 py-1 rounded"
+                        >
+                          Check IN
+                        </button>
                       )}
 
                       {v.status === "IN" && (
-                        <span className="text-green-600">
-                          Checked In
-                        </span>
-                      )}
-
-                      {v.status === "OUT" && (
-                        <span className="text-gray-600">
-                          Completed
-                        </span>
+                        <button
+                          onClick={()=>checkOutVisitor(v._id)}
+                          className="bg-red-500 text-white px-2 py-1 rounded"
+                        >
+                          Check OUT
+                        </button>
                       )}
 
                     </td>

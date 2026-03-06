@@ -2,69 +2,85 @@ import mongoose from "mongoose";
 
 const visitorSchema = new mongoose.Schema(
 {
-  visitor_name:{
+  // 🔹 Auto generated visitor id
+  visitor_id:{
     type:String,
-    required:true
+    unique:true
   },
 
-  mobile_number:{
-    type:String,
-    required:true
+  visitor_name: {
+    type: String,
+    required: true,
+    trim: true
   },
 
-  room_no:{
-    type:String,
-    default:null
+  mobile_number: {
+    type: String,
+    required: true,
+    trim: true
   },
 
-  student:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Student",
-    default:null
+  // Room is optional
+  room_no: {
+    type: String,
+    default: null
   },
 
-  visit_date:{
-    type:Date,
-    required:true
+  // ✅ Student reference
+  student: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Student",
+    default: null
   },
 
-  purpose:{
-    type:String
+  visit_date: {
+    type: Date,
+    required: true
   },
 
-  created_by:{
-    type:mongoose.Schema.Types.ObjectId,
-    refPath:"created_by_model"
+  purpose: {
+    type: String,
+    trim: true
   },
 
-  created_by_model:{
-    type:String,
-    enum:["Student","Admin","Warden"]
+  // Who created visitor request
+  created_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    refPath: "created_by_model"
   },
 
-  approved:{
-    type:Boolean,
-    default:false
+  created_by_model: {
+    type: String,
+    enum: ["Student", "Admin", "Warden"]
   },
 
-  check_in:{
-    type:Date,
-    default:null
+  // Warden/Admin approval
+  approved: {
+    type: Boolean,
+    default: false
   },
 
-  check_out:{
-    type:Date,
-    default:null
+  // Security Check-In time
+  check_in: {
+    type: Date,
+    default: null
   },
 
-  status:{
-    type:String,
-    enum:["PENDING","IN","OUT"],
-    default:"PENDING"
+  // Security Check-Out time
+  check_out: {
+    type: Date,
+    default: null
+  },
+
+  status: {
+    type: String,
+    enum: ["PENDING", "IN", "OUT"],
+    default: "PENDING"
   }
 
 },
-{timestamps:true}
-);
+{
+  timestamps: true
+});
 
-export default mongoose.model("Visitor",visitorSchema);
+export default mongoose.model("Visitor", visitorSchema);
