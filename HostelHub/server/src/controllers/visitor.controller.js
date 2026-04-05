@@ -3,9 +3,7 @@ import Student from "../models/Student.js";
 
 
 // ================= CREATE VISITOR =================
-
 export const createVisitor = async (req, res) => {
-
   try {
 
     const {
@@ -17,29 +15,30 @@ export const createVisitor = async (req, res) => {
       purpose
     } = req.body;
 
-    const role = req.user.role;
+    const role = req.user?.role;
 
-    // 🔹 Generate Visitor ID automatically
-    const count = await Visitor.countDocuments();
-    const visitor_id = "VIS" + String(count + 1).padStart(3, "0");
+    // 🔥 SAFE USER ID
+    const userId = req.user?._id || req.user?.id;
+
+    // 🔥 UNIQUE VISITOR ID (NO DUPLICATE ISSUE)
+    const visitor_id = `VIS-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     const visitor = new Visitor({
 
-      visitor_id,   // 🔥 auto generated id
+      visitor_id,
 
       visitor_name,
       mobile_number,
 
-      // room optional
       room_no: room_no || null,
 
-      // if student not provided → assign logged in student
-      student: student || req.user.id,
+      // 🔥 STUDENT LINK
+      student: student || userId,
 
       visit_date,
       purpose,
 
-      created_by: req.user.id,
+      created_by: userId,
 
       created_by_model:
         role === "student"
@@ -48,7 +47,6 @@ export const createVisitor = async (req, res) => {
           ? "Warden"
           : "Admin",
 
-      // student requests require approval
       approved: role === "student" ? false : true,
 
       status: "PENDING"
@@ -67,24 +65,37 @@ export const createVisitor = async (req, res) => {
     console.log("VISITOR CREATE ERROR:", error);
 
     res.status(500).json({
-      message: "Server error"
+      message: error.message || "Server error"
     });
 
   }
-
 };
 
 
 
 // ================= GET ALL VISITORS =================
-
 export const getVisitors = async (req, res) => {
-
   try {
 
-    const visitors = await Visitor.find()
-      .populate("student", "first_name last_name student_id room_no")
-      .sort({ createdAt: -1 });
+    const role = req.user?.role;
+    const userId = req.user?._id || req.user?.id;
+
+    let visitors;
+
+    if (role === "student") {
+      // 🔥 STUDENT → ONLY OWN VISITORS
+      visitors = await Visitor.find({
+        student: userId
+      })
+        .populate("student", "first_name last_name student_id room_no")
+        .sort({ createdAt: -1 });
+
+    } else {
+      // 🔥 ADMIN / WARDEN → ALL
+      visitors = await Visitor.find()
+        .populate("student", "first_name last_name student_id room_no")
+        .sort({ createdAt: -1 });
+    }
 
     res.json(visitors);
 
@@ -97,28 +108,23 @@ export const getVisitors = async (req, res) => {
     });
 
   }
-
 };
 
 
 
 // ================= GET STUDENT VISITORS =================
-
 export const getStudentVisitors = async (req, res) => {
-
   try {
 
-    const studentId = req.user.id;
+    const userId = req.user?._id || req.user?.id;
 
-    const student = await Student.findById(studentId);
+    const student = await Student.findById(userId);
 
     const visitors = await Visitor.find({
-
       $or: [
         { room_no: student?.room_no },
-        { student: studentId }
+        { student: userId }
       ]
-
     }).sort({ createdAt: -1 });
 
     res.json(visitors);
@@ -132,16 +138,21 @@ export const getStudentVisitors = async (req, res) => {
     });
 
   }
-
 };
 
 
 
 // ================= APPROVE VISITOR =================
-
 export const approveVisitor = async (req, res) => {
-
   try {
+
+    const role = req.user?.role;
+
+    if (!["admin", "warden"].includes(role)) {
+      return res.status(403).json({
+        message: "Only admin or warden can approve"
+      });
+    }
 
     const visitor = await Visitor.findById(req.params.id);
 
@@ -169,15 +180,12 @@ export const approveVisitor = async (req, res) => {
     });
 
   }
-
 };
 
 
 
 // ================= CHECK IN =================
-
 export const checkInVisitor = async (req, res) => {
-
   try {
 
     const visitor = await Visitor.findById(req.params.id);
@@ -207,15 +215,12 @@ export const checkInVisitor = async (req, res) => {
     });
 
   }
-
 };
 
 
 
 // ================= CHECK OUT =================
-
 export const checkOutVisitor = async (req, res) => {
-
   try {
 
     const visitor = await Visitor.findById(req.params.id);
@@ -245,5 +250,4 @@ export const checkOutVisitor = async (req, res) => {
     });
 
   }
-
 };

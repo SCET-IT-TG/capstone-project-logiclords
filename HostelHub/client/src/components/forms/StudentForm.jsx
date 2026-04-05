@@ -10,10 +10,15 @@ export default function CreateStudent() {
     middle_name: "",
     last_name: "",
     email: "",
-    mobile_number: "",
+    student_mobile: "",
+    parent_mobile: "",
+    permanent_address: "",
     gender: "",
     date_of_birth: "",
-    admission_date: ""
+    admission_date: "",
+    medical_issues: "",
+    room_no: "",
+    total_fee: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -58,16 +63,25 @@ Password: ${res.data.generated_password}`
         middle_name: "",
         last_name: "",
         email: "",
-        mobile_number: "",
+        student_mobile: "",
+        parent_mobile: "",
+        permanent_address: "",
         gender: "",
         date_of_birth: "",
-        admission_date: ""
+        admission_date: "",
+        medical_issues: "",
+        room_no: "",
+        total_fee: ""
       });
 
     } catch (error) {
+
       alert(error.response?.data?.message || "Error creating student");
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
@@ -136,16 +150,34 @@ Password: ${res.data.generated_password}`
 
             <input
               type="text"
-              name="mobile_number"
-              placeholder="Mobile Number"
-              value={formData.mobile_number}
+              name="student_mobile"
+              placeholder="Student Mobile"
+              value={formData.student_mobile}
               onChange={handleChange}
               className="w-full border p-2 rounded"
             />
 
-            {/* Date of Birth */}
+            <input
+              type="text"
+              name="parent_mobile"
+              placeholder="Parent Mobile"
+              value={formData.parent_mobile}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+
+            <input
+              type="text"
+              name="permanent_address"
+              placeholder="Permanent Address"
+              value={formData.permanent_address}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+
+          {/* DOB */}
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold mb-1">
                 Date of Birth
               </label>
               <input
@@ -153,13 +185,13 @@ Password: ${res.data.generated_password}`
                 name="date_of_birth"
                 value={formData.date_of_birth}
                 onChange={handleChange}
-                className="w-full border p-2 rounded mt-1"
+                className="w-full border p-2 rounded"
               />
             </div>
 
             {/* Admission Date */}
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold mb-1">
                 Admission Date
               </label>
               <input
@@ -167,7 +199,7 @@ Password: ${res.data.generated_password}`
                 name="admission_date"
                 value={formData.admission_date}
                 onChange={handleChange}
-                className="w-full border p-2 rounded mt-1"
+                className="w-full border p-2 rounded"
               />
             </div>
 
@@ -180,7 +212,35 @@ Password: ${res.data.generated_password}`
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
+              <option value="Other">Other</option>
             </select>
+
+            <input
+              type="text"
+              name="medical_issues"
+              placeholder="Medical Issues (optional)"
+              value={formData.medical_issues}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+
+            <input
+              type="text"
+              name="room_no"
+              placeholder="Room Number"
+              value={formData.room_no}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+
+            <input
+              type="number"
+              name="total_fee"
+              placeholder="Total Fee"
+              value={formData.total_fee}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
 
             <button
               type="submit"

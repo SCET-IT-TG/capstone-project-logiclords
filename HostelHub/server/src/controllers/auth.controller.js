@@ -77,6 +77,7 @@ export const login = async (req, res) => {
       user.name?.split(" ").slice(1).join(" ") ||
       "";
 
+    // ✅ FIX: include qr_code (only for students)
     res.status(200).json({
       message: "Login successful",
       token,
@@ -86,6 +87,7 @@ export const login = async (req, res) => {
         last_name: lastName,
         email: user.email,
         role: role,
+        qr_code: role === "student" ? user.qr_code : null, // 🔥 IMPORTANT FIX
       },
     });
 

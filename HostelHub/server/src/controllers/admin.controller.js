@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import Admin from "../models/Admin.js";
 
+// 🔐 GENERATE TOKEN
 const generateToken = (admin) => {
   return jwt.sign(
     {
@@ -13,6 +14,7 @@ const generateToken = (admin) => {
   );
 };
 
+// ✅ LOGIN ADMIN
 export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -31,8 +33,6 @@ export const loginAdmin = async (req, res) => {
 
     const token = generateToken(admin);
 
-    console.log("TOKEN IS:", token); // Debug
-
     res.status(200).json({
       message: "Login successful",
       token,
@@ -49,6 +49,22 @@ export const loginAdmin = async (req, res) => {
 
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ✅ GET ADMIN PROFILE (FIX ADDED)
+export const getAdminById = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.params.id).select("-password");
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    res.json(admin);
+
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };

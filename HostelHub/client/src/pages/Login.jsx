@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import logo from "../assets/logo.png";
@@ -19,7 +19,7 @@ export default function Login() {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent page refresh
+    e.preventDefault();
 
     if (!email || !password) {
       alert("❌ Email and Password are required");
@@ -40,13 +40,24 @@ export default function Login() {
         }
       );
 
-      console.log("LOGIN RESPONSE:", res.data);
+      console.log("🔥 FULL LOGIN RESPONSE:", res.data);
+      console.log("🔥 USER OBJECT:", res.data.user);
 
       const { token, user } = res.data;
 
-      // Save login data
+      // ⚠️ IMPORTANT: Clear old data first
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+
+      // ✅ Save fresh data
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+
+      // 🔍 Confirm saved data
+      console.log(
+        "✅ SAVED USER:",
+        JSON.parse(localStorage.getItem("user"))
+      );
 
       // Redirect based on role
       if (user.role === "admin") {
@@ -81,7 +92,7 @@ export default function Login() {
           <img
             src={logo}
             alt="HostelHub Logo"
-            className="w-40 h-20 object-contain mb-2"
+            className="w-45 h-25 object-contain mb-2"
           />
           <h2 className="text-2xl font-bold text-gray-800">Login</h2>
         </div>
@@ -89,7 +100,6 @@ export default function Login() {
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-4">
 
-          {/* Email */}
           <input
             type="email"
             placeholder="Email Address"
@@ -101,7 +111,6 @@ export default function Login() {
             required
           />
 
-          {/* Password */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -123,7 +132,6 @@ export default function Login() {
             </button>
           </div>
 
-          {/* Login Button */}
           <button
             type="submit"
             disabled={loading}
@@ -134,14 +142,8 @@ export default function Login() {
             {loading ? "Logging in..." : "Login"}
           </button>
 
-          {/* Forgot Password */}
           <div className="text-center">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-indigo-600 hover:underline"
-            >
-              Forgot Password?
-            </Link>
+            
           </div>
 
         </form>

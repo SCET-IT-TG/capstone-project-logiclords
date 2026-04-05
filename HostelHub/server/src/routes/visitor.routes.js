@@ -19,13 +19,13 @@ const router = express.Router();
 router.post("/", protect, createVisitor);
 
 
-// ================= GET ALL VISITORS =================
-// Admin / Warden only
-router.get("/", protect, authorize("admin","warden"), getVisitors);
+// ================= GET VISITORS =================
+// 🔥 ALL ROLES ALLOWED (logic handled in controller)
+router.get("/", protect, getVisitors);
 
 
 // ================= GET STUDENT VISITORS =================
-// Student only
+// Student only (optional separate API)
 router.get("/student", protect, authorize("student"), getStudentVisitors);
 
 
@@ -45,17 +45,17 @@ router.put("/checkout/:id", protect, authorize("admin","warden"), checkOutVisito
 
 
 // ================= VISITORS WITHOUT ROOM =================
-// Admin / Warden filter
+// Admin / Warden
 router.get(
   "/no-room",
   protect,
   authorize("admin","warden"),
-  async (req,res)=>{
+  async (req, res) => {
 
     const Visitor = (await import("../models/Visitor.js")).default;
 
     const visitors = await Visitor.find({
-      room_no:null
+      room_no: null
     });
 
     res.json(visitors);

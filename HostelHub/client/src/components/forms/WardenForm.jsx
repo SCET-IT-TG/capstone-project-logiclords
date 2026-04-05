@@ -25,38 +25,42 @@ export default function CreateWarden() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
+    try {
 
-    const res = await axios.post(
-      "http://localhost:5000/api/wardens/create",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      const res = await axios.post(
+        "http://localhost:5000/api/wardens/create",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    // ✅ Show ID and Password in alert
-    alert(
-      `Warden Created Successfully\n\nWarden ID: ${res.data.warden_id}\nPassword: ${res.data.generated_password}`
-    );
+      // ✅ SAVE DATA (FIX WARNING)
+      setGeneratedData({
+        warden_id: res.data.warden_id,
+        generated_password: res.data.generated_password,
+      });
 
-    setFormData({
-      first_name: "",
-      middle_name: "",
-      last_name: "",
-      date_of_birth: "",
-      assigned_block: "",
-      email: "",
-    });
+      // Optional alert
+      alert("Warden Created Successfully");
 
-  } catch (error) {
-    alert(error.response?.data?.message || "Error creating warden");
-  }
-};
+      setFormData({
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        date_of_birth: "",
+        assigned_block: "",
+        email: "",
+      });
+
+    } catch (error) {
+      alert(error.response?.data?.message || "Error creating warden");
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -69,7 +73,7 @@ export default function CreateWarden() {
             Register Warden
           </h2>
 
-          {/* Generated Info */}
+          {/* ✅ SHOW GENERATED DATA */}
           {generatedData && (
             <div className="bg-green-100 p-4 rounded mb-4 text-sm">
               <p><strong>Warden ID:</strong> {generatedData.warden_id}</p>

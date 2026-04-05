@@ -10,12 +10,14 @@ const feePaymentSchema = new mongoose.Schema(
 
   amount: {
     type: Number,
-    required: true
+    required: true,
+    min: 1
   },
 
-  payment_method: {
+  // 🔥 FIX: rename to match controller (payment_mode)
+  payment_mode: {
     type: String,
-    enum: ["Cash", "UPI", "Card", "Bank"],
+    enum: ["Cash", "UPI", "Paytm", "Card", "Bank"],
     default: "Cash"
   },
 
@@ -34,21 +36,30 @@ const feePaymentSchema = new mongoose.Schema(
 );
 
 
-// Auto generate receipt number
+// ================= AUTO GENERATE RECEIPT =================
 feePaymentSchema.pre("save", async function(next){
 
-  if(!this.receipt_no){
+  try {
 
-    const count = await mongoose.model("FeePayment").countDocuments();
+    if (!this.receipt_no) {
 
-    const number = String(count + 1).padStart(4,"0");
+      // 🔥 better unique logic (timestamp + random)
+      const unique = Date.now() + Math.floor(Math.random() * 1000);
 
-    this.receipt_no = `RCPT-${number}`;
+      this.receipt_no = `RCPT-${unique}`;
+    }
 
+    next();
+
+  } catch (err) {
+    next(err);
   }
 
-  next();
-
 });
+
+
+// ================= INDEX (FAST QUERY) =================
+feePaymentSchema.index({ student: 1, createdAt: -1 });
+
 
 export default mongoose.model("FeePayment", feePaymentSchema);

@@ -8,7 +8,10 @@ const ComplaintPage = () => {
 
   const [complaints, setComplaints] = useState([]);
   const [text, setText] = useState("");
+  const [file, setFile] = useState(null);
   const [remarks, setRemarks] = useState({});
+
+  const [selectedImage, setSelectedImage] = useState(null); // 🔥 MODAL
 
   const user = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
@@ -16,7 +19,6 @@ const ComplaintPage = () => {
 
   const fetchComplaints = async () => {
     try {
-
       const res = await axios.get(
         "http://localhost:5000/api/complaints",
         {
@@ -37,37 +39,57 @@ const ComplaintPage = () => {
     fetchComplaints();
   }, []);
 
+  // ================= SUBMIT =================
   const submitComplaint = async () => {
 
     if (!text) return alert("Enter complaint");
 
-    await axios.post(
-      "http://localhost:5000/api/complaints",
-      { complaint: text },
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
+    try {
+      const formData = new FormData();
+      formData.append("complaint", text);
 
-    setText("");
-    fetchComplaints();
+      // ✅ OPTIONAL PHOTO
+      if (file) formData.append("photo", file);
+
+      await axios.post(
+        "http://localhost:5000/api/complaints",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      setText("");
+      setFile(null);
+      fetchComplaints();
+
+    } catch (err) {
+      console.log(err);
+    }
   };
 
+  // ================= STATUS =================
   const updateStatus = async (id, status) => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/complaints/${id}`,
+        { status, remark: remarks[id] },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
 
-    await axios.put(
-      `http://localhost:5000/api/complaints/${id}`,
-      { status, remark: remarks[id] },
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
+      fetchComplaints();
 
-    fetchComplaints();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
-
     <div className="flex">
 
       <Sidebar />
@@ -82,8 +104,8 @@ const ComplaintPage = () => {
             Complaint Management
           </h2>
 
+          {/* ================= STUDENT FORM ================= */}
           {(role === "student" || role === "warden") && (
-
             <div className="bg-white p-4 rounded shadow mb-6">
 
               <textarea
@@ -91,6 +113,12 @@ const ComplaintPage = () => {
                 placeholder="Write complaint..."
                 value={text}
                 onChange={(e) => setText(e.target.value)}
+              />
+
+              <input
+                type="file"
+                className="mb-3"
+                onChange={(e) => setFile(e.target.files[0])}
               />
 
               <button
@@ -101,28 +129,26 @@ const ComplaintPage = () => {
               </button>
 
             </div>
-
           )}
 
+          {/* ================= TABLE ================= */}
           <div className="bg-white p-4 rounded shadow">
 
-            <table className="w-full border">
+            <table className="w-full border text-sm">
 
               <thead className="bg-gray-200">
-
                 <tr>
                   <th className="border p-2">Complaint No</th>
-                  <th className="border p-2">User ID</th>
                   <th className="border p-2">Name</th>
                   <th className="border p-2">Mobile</th>
-                  <th className="border p-2">Complaint</th>
+                  <th className="border p-2">Description</th>
+                  <th className="border p-2">Photo</th>
                   <th className="border p-2">Status</th>
                   <th className="border p-2">Remark</th>
 
                   {(role === "admin" || role === "warden") &&
                     <th className="border p-2">Action</th>}
                 </tr>
-
               </thead>
 
               <tbody>
@@ -134,93 +160,92 @@ const ComplaintPage = () => {
                   const name =
                     person?.first_name
                       ? `${person.first_name} ${person.last_name}`
-                      : person?.name || "Unknown";
-
-                  const id =
-                    person?.student_id ||
-                    person?.warden_id ||
-                    person?.admin_id ||
-                    person?._id;
+                      : "Unknown";
 
                   const mobile =
-                    person?.mobile_number || "-";
+                            person?.student_mobile ||
+                            person?.mobile_number ||
+                            "-";
 
                   return (
-
                     <tr key={c._id} className="text-center">
 
-                      <td className="border p-2">
-                        CMP-{index + 1}
-                      </td>
-
-                      <td className="border p-2">{id}</td>
-
+                      <td className="border p-2">CMP-{index + 1}</td>
                       <td className="border p-2">{name}</td>
-
                       <td className="border p-2">{mobile}</td>
-
                       <td className="border p-2">{c.complaint}</td>
 
+                      {/* 🔥 VIEW BUTTON */}
                       <td className="border p-2">
-
-                        {c.status === "Pending" &&
-                          <span className="bg-yellow-400 text-white px-2 py-1 rounded">
-                            Pending
-                          </span>}
-
-                        {c.status === "Assigned" &&
-                          <span className="bg-blue-500 text-white px-2 py-1 rounded">
-                            Assigned
-                          </span>}
-
-                        {c.status === "Completed" &&
-                          <span className="bg-green-500 text-white px-2 py-1 rounded">
-                            Completed
-                          </span>}
-
+                        {c.photo ? (
+                          <button
+                            onClick={() =>
+                              setSelectedImage(`http://localhost:5000/${c.photo}`)
+                            }
+                            className="bg-indigo-500 text-white px-2 py-1 rounded"
+                          >
+                            View
+                          </button>
+                        ) : "-"}
                       </td>
 
+                      {/* STATUS */}
                       <td className="border p-2">
-                        {c.remark || "-"}
+                        <span className={`px-2 py-1 text-white rounded ${
+                          c.status === "Pending"
+                            ? "bg-yellow-400"
+                            : c.status === "Assigned"
+                            ? "bg-blue-500"
+                            : "bg-green-500"
+                        }`}>
+                          {c.status}
+                        </span>
                       </td>
+
+                      <td className="border p-2">{c.remark || "-"}</td>
 
                       {(role === "admin" || role === "warden") && (
+  <td className="border p-2 text-center">
 
-                        <td className="border p-2">
+    {c.status !== "Completed" && (
+      <>
+        <input
+          type="text"
+          placeholder="Remark"
+          className="border p-1 mb-2"
+          value={remarks[c._id] || ""}
+          onChange={(e) =>
+            setRemarks({
+              ...remarks,
+              [c._id]: e.target.value
+            })
+          }
+        />
 
-                          <input
-                            type="text"
-                            placeholder="Remark"
-                            className="border p-1 mr-2"
-                            value={remarks[c._id] || ""}
-                            onChange={(e) =>
-                              setRemarks({
-                                ...remarks,
-                                [c._id]: e.target.value
-                              })
-                            }
-                          />
+        <div className="flex gap-2 justify-center">
+          {c.status === "Pending" && (
+            <button
+              className="bg-blue-500 text-white px-2 py-1 rounded"
+              onClick={() => updateStatus(c._id, "Assigned")}
+            >
+              Assign
+            </button>
+          )}
 
-                          <button
-                            className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
-                            onClick={() => updateStatus(c._id, "Assigned")}
-                          >
-                            Assign
-                          </button>
+          <button
+            className="bg-green-600 text-white px-2 py-1 rounded"
+            onClick={() => updateStatus(c._id, "Completed")}
+          >
+            Complete
+          </button>
+        </div>
+      </>
+    )}
 
-                          <button
-                            className="bg-green-600 text-white px-2 py-1 rounded"
-                            onClick={() => updateStatus(c._id, "Completed")}
-                          >
-                            Complete
-                          </button>
-
-                        </td>
-
-                      )}
+  </td>
+)}
 
                     </tr>
-
                   );
 
                 })}
@@ -231,14 +256,36 @@ const ComplaintPage = () => {
 
           </div>
 
+          {/* ================= IMAGE MODAL ================= */}
+          {selectedImage && (
+            <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+
+              <div className="bg-white p-4 rounded shadow-lg relative">
+
+                <button
+                  className="absolute top-2 right-2 text-red-500"
+                  onClick={() => setSelectedImage(null)}
+                >
+                  ✖
+                </button>
+
+                <img
+                  src={selectedImage}
+                  alt="Complaint"
+                  className="max-w-[500px] max-h-[500px]"
+                />
+
+              </div>
+
+            </div>
+          )}
+
         </div>
 
       </div>
 
     </div>
-
   );
-
 };
 
 export default ComplaintPage;

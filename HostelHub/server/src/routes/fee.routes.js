@@ -4,7 +4,8 @@ import {
   getAllFees,
   payFee,
   paymentHistory,
-  studentFeeStatus
+  studentFeeStatus,
+  updateTotalFee
 } from "../controllers/fee.controller.js";
 
 import { protect } from "../middleware/auth.middleware.js";
@@ -12,13 +13,25 @@ import { protect } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 
-// Admin routes
+// ================= ADMIN ROUTES =================
+
+// ✅ get all students fee
 router.get("/admin", protect, getAllFees);
-router.post("/pay", protect, payFee);
-router.get("/history", protect, paymentHistory);
+
+// ✅ update total fee
+router.put("/update/:id", protect, updateTotalFee);
+
+// ✅ pay fee (student id in params)
+router.post("/pay/:id", protect, payFee);
+
+// ✅ payment history (student-wise)
+router.get("/history/:id", protect, paymentHistory);
 
 
-// Student route
+// ================= STUDENT ROUTE =================
+
+// ✅ student own fee
 router.get("/student", protect, studentFeeStatus);
+
 
 export default router;

@@ -4,51 +4,63 @@ import Complaint from "../models/Complaint.js";
 // ================= CREATE COMPLAINT =================
 export const createComplaint = async (req, res) => {
   try {
-
+     console.log("USER DATA:", req.user);
     const { complaint } = req.body;
 
     if (!complaint) {
       return res.status(400).json({ message: "Complaint text required" });
     }
 
-    const role = req.user.role;
+    const role = req.user?.role;
 
-    if (role !== "student" && role !== "warden") {
-      return res
-        .status(403)
-        .json({ message: "Only student or warden can create complaints" });
+    if (!["student", "warden"].includes(role)) {
+      return res.status(403).json({
+        message: "Only student or warden can create complaints"
+      });
     }
 
     const model = role === "warden" ? "Warden" : "Student";
 
-    const newComplaint = new Complaint({
-      created_by: req.user.id,
+    // ✅ OPTIONAL PHOTO
+    const photo = req.file ? req.file.path : "";
+
+    // 🔥 UNIQUE COMPLAINT NUMBER (NO DUPLICATE ISSUE)
+    const complaint_no = `CMP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const newComplaint = await Complaint.create({
+      created_by: req.user?._id || req.user?.id,
       created_by_model: model,
       complaint,
+      photo,
+      complaint_no,   // 🔥 IMPORTANT FIX
       status: "Pending"
     });
 
-    await newComplaint.save();
-
-    // populate user details before sending response
     const populatedComplaint = await Complaint.findById(newComplaint._id)
       .populate({
         path: "created_by",
         select:
-          "first_name last_name name student_id warden_id admin_id mobile_number"
+          "first_name last_name name student_id warden_id admin_id student_mobile"
       });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Complaint submitted successfully",
       complaint: populatedComplaint
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error("CREATE COMPLAINT ERROR:", error);
 
-    res.status(500).json({
-      message: "Server error"
+    // 🔥 HANDLE DUPLICATE ERROR SAFELY
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message: "Duplicate complaint detected. Try again."
+      });
+    }
+
+    return res.status(500).json({
+      message: error.message || "Server error"
     });
 
   }
@@ -64,17 +76,17 @@ export const getComplaints = async (req, res) => {
       .populate({
         path: "created_by",
         select:
-          "first_name last_name name student_id warden_id admin_id mobile_number"
+          "first_name last_name name student_id warden_id admin_id student_mobile"
       })
       .sort({ createdAt: -1 });
 
-    res.status(200).json(complaints);
+    return res.status(200).json(complaints);
 
   } catch (error) {
 
-    console.error(error);
+    console.error("GET COMPLAINTS ERROR:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed to fetch complaints"
     });
 
@@ -89,9 +101,9 @@ export const updateComplaintStatus = async (req, res) => {
 
     const { status, remark } = req.body;
 
-    const role = req.user.role;
+    const role = req.user?.role;
 
-    if (role !== "admin" && role !== "warden") {
+    if (!["admin", "warden"].includes(role)) {
       return res.status(403).json({
         message: "Only admin or warden can update status"
       });
@@ -125,20 +137,20 @@ export const updateComplaintStatus = async (req, res) => {
       .populate({
         path: "created_by",
         select:
-          "first_name last_name name student_id warden_id admin_id mobile_number"
+          "first_name last_name name student_id warden_id admin_id student_mobile"
       });
 
-    res.json({
+    return res.status(200).json({
       message: "Status updated successfully",
       complaint: updatedComplaint
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error("UPDATE STATUS ERROR:", error);
 
-    res.status(500).json({
-      message: "Server error"
+    return res.status(500).json({
+      message: error.message || "Server error"
     });
 
   }

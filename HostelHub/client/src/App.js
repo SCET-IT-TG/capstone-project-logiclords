@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
-import QRScanner from "./pages/QRScanner";
+//import QRScanner from "./pages/QRScanner";
+
+// ✅ FIXED IMPORT PATH
+import QRCard from "./pages/QRCard";
 
 // Dashboards
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
@@ -22,6 +25,23 @@ import FeeStatus from "./pages/FeeStatus";
 // Visitor Pages
 import VisitorPage from "./pages/visitors/VisitorPage";
 import StudentVisitors from "./pages/visitors/StudentVisitors";
+
+import Profile from "./pages/Profile";
+
+//editwarden
+import EditWarden from "./pages/EditWarden";
+
+//editstudent
+import EditStudent from "./pages/EditStudent";
+
+//addroom
+import AddRoom from "./pages/admin/AddRoom";
+
+import EditRoom from "./pages/admin/EditRoom";
+
+import ScanQR from "./pages/admin/ScanQR";
+
+import EntryHistory from "./pages/admin/EntryHistory";
 
 
 // 🔐 Protected Route with Role Support
@@ -93,7 +113,6 @@ function App() {
           }
         />
 
-        {/* NEW VISITOR PAGE FOR ADMIN/WARDEN */}
         <Route
           path="/visitors"
           element={
@@ -154,7 +173,6 @@ function App() {
           }
         />
 
-        {/* STUDENT VISITOR PAGE */}
         <Route
           path="/student-visitors"
           element={
@@ -164,17 +182,27 @@ function App() {
           }
         />
 
+        {/* ✅ QR PAGE ROUTE */}
+        <Route
+          path="/student/qr"
+          element={
+            <ProtectedRoute allowedRoles={["student"]}>
+              <QRCard />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* ================= QR SCANNER ================= */}
 
-        <Route
+        {/*<Route
           path="/scan"
           element={
             <ProtectedRoute allowedRoles={["admin", "warden"]}>
               <QRScanner />
             </ProtectedRoute>
           }
-        />
+        />*}
 
 
         {/* ================= COMMON COMPLAINT PAGE ================= */}
@@ -187,12 +215,28 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/*editwarden*/}
+      <Route path="/edit-warden/:id" element={<EditWarden />} />
+      
+       {/*editstudent*/}
+      <Route path="/edit-student/:id" element={<EditStudent />} />
 
-
+            <Route path="/add-room" element={<AddRoom />} />
+            <Route path="/edit-room/:id" element={<EditRoom />} />
+            <Route path="/scan-qr" element={<ScanQR />} />
+            <Route
+              path="/entry-history"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "warden"]}>
+                  <EntryHistory />
+                </ProtectedRoute>
+              }
+            />
         {/* ================= 404 ================= */}
 
         <Route path="*" element={<h2>404 - Page Not Found</h2>} />
 
+          <Route path="/profile" element={<Profile />} />
       </Routes>
 
     </BrowserRouter>

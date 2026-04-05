@@ -28,6 +28,12 @@ const complaintSchema = new mongoose.Schema(
     required: true
   },
 
+  // 🔥 NEW: PHOTO FIELD (OPTIONAL)
+  photo: {
+    type: String,
+    default: ""
+  },
+
   // Status
   status: {
     type: String,
