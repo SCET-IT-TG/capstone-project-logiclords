@@ -3,6 +3,11 @@
 ---
 
 # 🏠 HostelHub - Smart Hostel Management System  
+<p align="center">
+  <img src="https://img.shields.io/badge/Framework-MERN-orange.svg" />
+  <img src="https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black" />
+</p>
 
 A full-stack web application to **digitally manage hostel operations** including room allocation, fee tracking, complaints, and secure QR-based entry.
 
@@ -16,8 +21,7 @@ It improves efficiency, transparency, and security in hostel management.
 ---
 
 ## ✨ Core Features  
-
-- 🛏 **Room Allocation** – Assign and manage rooms efficiently  
+ 
 - 💰 **Fee Management** – Track payments, dues, and receipts  
 - 🛠 **Complaint System** – Raise and resolve student complaints  
 - 👤 **Visitor Entry** – Maintain digital visitor logs  
@@ -65,6 +69,87 @@ It improves efficiency, transparency, and security in hostel management.
 ### 🔁 1. Clone Repository  
 
 ```bash
-git clone https://github.com/your-username/HostelHub.git
+git clone https://github.com/SCET-IT-TG/capstone-project-logiclords.git
 cd HostelHub
+```
+## 📦 2. Install Dependencies
 
+To get the project running, you need to install the dependencies for both the backend and the frontend.
+
+### Install Backend
+Open your terminal and navigate to the `server` directory:
+```bash
+cd server
+npm install
+```
+## 🔐 3. Environment Variables
+
+The backend requires certain environment variables to connect to the database and handle security. 
+
+1. Create a `.env` file inside the `server/` directory.
+2. Copy and paste the following variables into the file:
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
+## ▶️ 4. Run the Application
+
+To get the full-stack application running, you will need to start both the backend and the frontend servers.
+
+### Start Backend
+Open a terminal and run:
+```bash
+cd server
+npm run dev
+```
+###Start Frontend
+```bash
+cd client
+npm start
+```
+
+## 🔑 Key Modules
+
+HostelHub is built with a modular architecture to handle every aspect of hostel administration:
+
+* **👤 Student Management** A comprehensive database for maintaining student profiles, emergency contacts, and academic records.
+    
+* **💰 Fee Collection & Tracking** Digital ledger to track payment history, generate invoices, and send reminders for outstanding dues.
+    
+* **🎫 Complaint Management** An internal ticketing system where students can report maintenance issues and track the status of their requests.
+    
+* **📖 Visitor Entry Logs** A secure digital register to log guest details, purpose of visit, and entry/exit timestamps.
+    
+* **🛡️ QR Code Authentication** Advanced security module providing students with unique QR codes for contactless check-ins and identity verification.
+
+## 👥 Team Members & Roles
+
+Our team is composed of dedicated developers and engineers ensuring the stability and growth of **HostelHub**.
+
+| Name | Role |
+| :--- | :--- |
+| **RANA KISHAN PRAVINBHAI** | Team Lead & QA Engineer |
+| **SAVANI KIRTAN CHETANBHAI** | Frontend Developer |
+| **KHADELA YUG KAPILBHAI** | MERN Developer |
+| **NAGADWALA VEER HARISHKUMAR** | MERN Developer + Testing |
+| **KEVADIYA KRISH NITESHBHAI** | Backend & Database Engineer |
+
+---
+## 📸 Screenshots
+
+
+## 📈 Future Enhancements
+
+We are constantly looking to improve **HostelHub**. Here are the features currently in our roadmap:
+
+-  **🔔 Email & SMS Notifications:** Automated alerts for fee deadlines, emergency notices, and complaint status updates.
+-  **📱 Mobile App Version:** A dedicated React Native or Flutter application for students to manage their stay on the go.
+-  **📊 Advanced Analytics Dashboard:** Visual insights for admins to track occupancy rates, revenue growth, and maintenance trends.
+-  **🤖 AI-Based Room Allocation:** An intelligent algorithm to suggest room pairings based on student preferences, habits, and personality profiles.
+
+---
+## 👨‍💻 Developed By
+
+HostelHub Team
