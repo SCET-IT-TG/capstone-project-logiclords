@@ -104,7 +104,8 @@ Open a terminal and run:
 cd server
 npm run dev
 ```
-###Start Frontend
+### Start Frontend
+Open a terminal and run:
 ```bash
 cd client
 npm start
@@ -136,8 +137,11 @@ Our team is composed of dedicated developers and engineers ensuring the stabilit
 | **NAGADWALA VEER HARISHKUMAR** | MERN Developer + Testing |
 | **KEVADIYA KRISH NITESHBHAI** | Backend & Database Engineer |
 
----
+
 ## 📸 Screenshots
+<img width="1915" height="871" alt="Screenshot 2026-04-13 185828" src="https://github.com/user-attachments/assets/26671ac2-f7d9-4bae-8705-1a71f10ed0d9" />
+
+## 📸 Link of Video(Interaction of Web)
 
 
 ## 📈 Future Enhancements
