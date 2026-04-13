@@ -9,16 +9,12 @@
   <img src="https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black" />
 </p>
 
-A full-stack web application to **digitally manage hostel operations** including room allocation, fee tracking, complaints, and secure QR-based entry.
-
----
+A full-stack web application to **digitally manage hostel operations** including fee tracking, complaints, and secure QR-based entry.
 
 ## 📌 Overview  
 
 **HostelHub** replaces outdated manual registers and Excel sheets with an **automated, centralized, and scalable system**.  
 It improves efficiency, transparency, and security in hostel management.
-
----
 
 ## ✨ Core Features  
  
@@ -28,12 +24,8 @@ It improves efficiency, transparency, and security in hostel management.
 - 📱 **QR-Based Entry** – Secure hostel access system  
 - 📊 **Admin Dashboard** – Insights and analytics  
 
----
-
 ## 🧱 System Architecture  
 <img width="400" height="200" alt="image" src="https://github.com/user-attachments/assets/19f0dadd-c52e-485b-99d2-2049f461e39a" />
-
----
 
 ## 🛠 Tech Stack  
 
@@ -43,8 +35,6 @@ It improves efficiency, transparency, and security in hostel management.
 | Backend | Node.js, Express.js |
 | Database | MongoDB |
 | Tools | QR Code Generator |
-
----
 
 ## 📂 Project Structure  
 📦 HostelHub<br>
@@ -61,8 +51,6 @@ It improves efficiency, transparency, and security in hostel management.
  ┣ 📄 .env<br>
  ┣ 📄 package.json<br>
  ┗ 📄 README.md
-
----
 
 ## ⚙️ Setup Instructions  
 
@@ -142,7 +130,8 @@ Our team is composed of dedicated developers and engineers ensuring the stabilit
 <img width="1915" height="871" alt="Screenshot 2026-04-13 185828" src="https://github.com/user-attachments/assets/26671ac2-f7d9-4bae-8705-1a71f10ed0d9" />
 
 ## 📸 Link of Video(Interaction of Web)
-
+Click the link and Dowload 
+https://drive.google.com/file/d/1SF7QSg8n6GOk1bz2EmA9jr8mxjnhS7Cc/view?usp=sharing
 
 ## 📈 Future Enhancements
 
@@ -153,7 +142,6 @@ We are constantly looking to improve **HostelHub**. Here are the features curren
 -  **📊 Advanced Analytics Dashboard:** Visual insights for admins to track occupancy rates, revenue growth, and maintenance trends.
 -  **🤖 AI-Based Room Allocation:** An intelligent algorithm to suggest room pairings based on student preferences, habits, and personality profiles.
 
----
 ## 👨‍💻 Developed By
 
 HostelHub Team
